@@ -40,6 +40,32 @@ async def main():
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
+    # Clean the pages directory before starting the job
+    PAGES_DIR.mkdir(parents=True, exist_ok=True)
+    removed = 0
+    for item in PAGES_DIR.iterdir():
+        if item.is_file():
+            try:
+                item.unlink()
+                removed += 1
+            except Exception as e:
+                print(f"⚠️ Failed to remove {item.name}: {e}")
+    if removed:
+        print(f"🧹 Cleared {removed} file(s) from pages directory: {PAGES_DIR}")
+
+    # Clean the clean directory before starting the job
+    CLEAN_DIR.mkdir(parents=True, exist_ok=True)
+    removed_clean = 0
+    for item in CLEAN_DIR.iterdir():
+        if item.is_file():
+            try:
+                item.unlink()
+                removed_clean += 1
+            except Exception as e:
+                print(f"⚠️ Failed to remove {item.name}: {e}")
+    if removed_clean:
+        print(f"🧹 Cleared {removed_clean} file(s) from clean directory: {CLEAN_DIR}")
+
     output_file = OUTPUT_DIR / f"{selected_input.stem}.text"
 
     # 1) Extract (comment out if you want to reuse existing 'pages')
