@@ -1,12 +1,11 @@
 import asyncio
 import os
+import random
 from pathlib import Path
-from typing import Optional
+
+from dotenv import load_dotenv
 from openai import AsyncOpenAI
 from tqdm import tqdm
-from dotenv import load_dotenv
-import random
-import time
 
 load_dotenv()
 
@@ -34,7 +33,7 @@ async def _call_gpt(text: str) -> str:
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": text},
         ],
-        #max_tokens=MAX_OUTPUT_TOKENS,
+        # max_tokens=MAX_OUTPUT_TOKENS,
     )
     return resp.choices[0].message.content.strip()
 
@@ -48,7 +47,7 @@ async def _retry_gpt(text: str, retries: int = 5, base_delay: float = 1.5) -> st
                 raise
             # Exponential backoff with jitter
             delay = base_delay * (2 ** attempt) + random.uniform(0, 0.5)
-            print(f"⚠️ GPT call failed (attempt {attempt+1}/{retries}): {e}. Retrying in {delay:.1f}s...")
+            print(f"⚠️ GPT call failed (attempt {attempt + 1}/{retries}): {e}. Retrying in {delay:.1f}s...")
             await asyncio.sleep(delay)
     # unreachable
     return text

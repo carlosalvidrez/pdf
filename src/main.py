@@ -1,11 +1,12 @@
 import asyncio
-from pathlib import Path
-from dotenv import load_dotenv
 import os
+from pathlib import Path
 
-from ocr_extract import extract_text_per_page
+from dotenv import load_dotenv
+
 from gpt_cleanup import process_pages
 from merge_pages import merge_cleaned_pages
+from ocr_extract import extract_text_per_page
 
 load_dotenv()
 
