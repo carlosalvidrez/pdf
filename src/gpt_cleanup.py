@@ -20,9 +20,21 @@ MAX_OUTPUT_TOKENS = int(os.getenv("MAX_OUTPUT_TOKENS", "2048"))
 client = AsyncOpenAI(api_key=API_KEY)
 
 SYSTEM_PROMPT = (
-    "You are an expert OCR text corrector. Correct misspellings, diacritics, "
-    "and punctuation errors based on context. Preserve paragraph structure, language, "
-    "and meaning. Do not invent new content; only fix recognition errors. Return only the cleaned text."
+    "You are an expert OCR text corrector and structural normalizer. Correct misspellings, diacritics, "
+    "and punctuation errors based on context. Preserve the original language, meaning, and paragraph flow. "
+    "Do not invent new content; only fix recognition errors. Return only the cleaned text. "
+    "\n\n"
+    "Footnote handling rules (very important): "
+    "\n- Detect inline or interrupting footnotes that break a paragraph mid-flow. This pattern often looks like: "
+    "Paragraph A begins → a short footnote-like paragraph appears → Paragraph A continues. "
+    "\n- Common footnote markers: leading digits or bracketed digits (e.g., '1', '[1]'), asterisks ('*', '**'), "
+    "or superscript-like markers captured as inline numbers. The footnote text is usually short and not a full narrative paragraph. "
+    "\n- When you detect that a paragraph was interrupted by such a footnote, reconstruct the full main paragraph by joining its parts, "
+    "and move the footnote text to immediately after the end of that reconstructed paragraph. Keep the footnote marker (if present) and its text together. "
+    "\n- Do not move normal paragraphs. Be conservative: only treat something as a footnote if it clearly matches the pattern above or is obviously a reference note. "
+    "\n- If multiple footnotes interrupt the same paragraph, collect them and place them all after that paragraph, in their original order. "
+    "\n- Do not renumber footnotes; preserve the markers as extracted. "
+    "\n- Preserve page-local content only; do not bring content from context pages into the output."
 )
 
 
@@ -55,7 +67,8 @@ async def _process_one(page_file: Path, prev_text: str, next_text: str, clean_di
         raw_text = page_file.read_text(encoding="utf-8")
         user_content = (
             "Use the surrounding pages only as context to better correct OCR errors in the CURRENT page.\n"
-            "Do not copy or rephrase content from context pages into the output.\n\n"
+            "Do not copy or rephrase content from context pages into the output.\n"
+            "If a paragraph on the CURRENT page is interrupted by a footnote-like line, move that footnote to after the end of the interrupted paragraph and join the paragraph parts. Be conservative.\n\n"
             "=== PREVIOUS PAGE (context only) ===\n" + (prev_text or "") + "\n\n"
             "=== CURRENT PAGE (to clean) ===\n" + raw_text + "\n\n"
             "=== NEXT PAGE (context only) ===\n" + (next_text or "") + "\n\n"
