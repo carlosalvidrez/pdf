@@ -1,0 +1,14 @@
+# Ignore document files
+*.pdf
+*.text
+*.txt
+
+# Other
+# Ignore any directory named 'scratch' at any depth
+scratch/
+
+# JetBrains IDE project files (do not commit per-user settings)
+.idea/
+*.iml
+*.ipr
+*.iws

@@ -1,0 +1,19 @@
+[project]
+name = "text-cleanup-pipeline"
+version = "0.1.1"
+description = "OCR and GPT-based text cleanup pipeline for long PDFs"
+requires-python = ">=3.10"
+
+dependencies = [
+    "pymupdf",
+    "easyocr",
+    "openai>=1.12.0",
+    "tqdm",
+    "python-dotenv",
+]
+
+[tool.uv]
+default-task = "run"
+
+[tool.uv.scripts]
+run = "python src/main.py"
