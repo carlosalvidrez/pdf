@@ -1,5 +1,6 @@
 from pathlib import Path
 
+
 def merge_cleaned_pages(clean_dir: Path, output_file: Path):
     output_file.parent.mkdir(exist_ok=True)
     with open(output_file, "w", encoding="utf-8") as out:

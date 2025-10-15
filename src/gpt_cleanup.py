@@ -26,6 +26,7 @@ SYSTEM_PROMPT = (
     "and meaning. Do not invent new content; only fix recognition errors. Return only the cleaned text."
 )
 
+
 async def _call_gpt(text: str) -> str:
     resp = await client.chat.completions.create(
         model=MODEL,
@@ -33,9 +34,10 @@ async def _call_gpt(text: str) -> str:
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": text},
         ],
-        max_tokens=MAX_OUTPUT_TOKENS,
+        #max_tokens=MAX_OUTPUT_TOKENS,
     )
     return resp.choices[0].message.content.strip()
+
 
 async def _retry_gpt(text: str, retries: int = 5, base_delay: float = 1.5) -> str:
     for attempt in range(retries):
@@ -51,11 +53,13 @@ async def _retry_gpt(text: str, retries: int = 5, base_delay: float = 1.5) -> st
     # unreachable
     return text
 
+
 async def _process_one(page_file: Path, clean_dir: Path, sem: asyncio.Semaphore):
     async with sem:
         raw_text = page_file.read_text(encoding="utf-8")
         cleaned = await _retry_gpt(raw_text)
         (clean_dir / page_file.name).write_text(cleaned, encoding="utf-8")
+
 
 async def process_pages(raw_dir: Path, clean_dir: Path):
     clean_dir.mkdir(exist_ok=True)

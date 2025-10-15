@@ -2,6 +2,7 @@ import fitz  # PyMuPDF
 import easyocr
 from pathlib import Path
 
+
 def extract_text_per_page(pdf_path: str, output_dir: Path, lang: str = "es"):
     """Extract text from each PDF page.
     Fallback to OCR with EasyOCR when the embedded text layer is empty.
