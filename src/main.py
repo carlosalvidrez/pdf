@@ -18,8 +18,9 @@ CLEAN_DIR = BASE_DIR / "clean"
 
 
 async def main():
-    # Use a dedicated OCR language setting instead of system locale LANG
+    # Use dedicated OCR settings
     lang = os.getenv("OCR_LANG", "es")
+    ocr_mode = os.getenv("OCR_MODE", "auto").lower()  # auto | local | llm
 
     # Find the first input file in the input directory (prefer PDFs)
     input_candidates = sorted(INPUT_DIR.iterdir()) if INPUT_DIR.exists() else []
@@ -71,7 +72,7 @@ async def main():
 
     # 1) Extract (comment out if you want to reuse existing 'pages')
     print("🔍 Extracting text from PDF...", selected_input.name)
-    extract_text_per_page(str(selected_input), PAGES_DIR, lang=lang)
+    extract_text_per_page(str(selected_input), PAGES_DIR, lang=lang, mode=ocr_mode)
 
     # 2) Cleanup with GPT (parallelized with throttling)
     print("🧠 Sending pages to GPT for cleanup...")

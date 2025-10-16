@@ -31,7 +31,12 @@ uv run
 Output will be written to `output/book_cleaned.txt`.
 
 ## Notes
-- If a PDF page has an embedded text layer, we use it. If not, we OCR with EasyOCR.
+- OCR modes:
+  - `OCR_MODE=auto` (default): use embedded text if available; otherwise local EasyOCR.
+  - `OCR_MODE=local`: force local OCR when needed.
+  - `OCR_MODE=llm`: perform OCR with the LLM using rendered page images. The CURRENT page is sent along with PREVIOUS and NEXT page images as context to improve accuracy. Only the CURRENT page text is returned.
+  - To pick the model for LLM OCR, set `OCR_LLM_MODEL` (defaults to `LLM_MODEL` or `gpt-4o-mini`).
+- The pipeline always splits the source PDF into single-page PDFs under `pages/pdfs/` (one PDF per page).
 - Concurrency (parallel page cleanup) is controlled by `MAX_CONCURRENCY` in `.env`.
-- The LLM used is controlled by `LLM_MODEL` in `.env`.
+- The cleanup LLM used is controlled by `LLM_MODEL` in `.env`.
 - You can rerun without re-extracting by commenting the extraction step in `src/main.py`.
